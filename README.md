@@ -67,7 +67,7 @@ Conçue pour tourner sur n'importe quelle Debian sans dépendance à `gpsd` - le
 | Récepteur | Chipset | Constellations | Interface |
 |-----------|---------|----------------|-----------|
 | [Adafruit Ultimate GPS GNSS with USB](https://www.adafruit.com/product/4279) (PID 4279) | MediaTek MT3333 (PA1616D) | GPS + GLONASS | USB-C (CP2102N), vu en `/dev/ttyUSB0` |
-| Adafruit Ultimate GPS HAT / breakout PA1616D | MediaTek MT3333 | GPS + GLONASS | UART (`/dev/ttyAMA0`, `/dev/serial0`) |
+| [Adafruit Ultimate GPS HAT / breakout PA1616D](https://learn.adafruit.com/adafruit-ultimate-gps-hat-for-raspberry-pi) | MediaTek MT3333 (PA1616D) | GPS + GLONASS | UART (`/dev/ttyAMA0`, `/dev/serial0`) |
 
 Fonctionne avec tout récepteur émettant des trames NMEA 0183 standard à 9600 bauds.
 visualGPS lit uniquement les trames NMEA ; le signal PPS (présent sur ces modules) n'est pas utilisé.
