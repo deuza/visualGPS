@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     visualGPS - page principale
+     4 onglets : Front Panel, Scatter Plot, Position Plot, NMEA Monitor.
+     Toute la logique est dans les scripts JS charges en bas de page.
+     ============================================================ -->
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>visualGPS</title>
+
+  <!-- Feuille de style locale -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Dependances externes (CDN) : Leaflet = carte, uPlot = graphes.
+       Pour un deploiement durci, voir la note vie privee / SRI du README. -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uplot@1.6.32/dist/uPlot.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/uplot@1.6.32/dist/uPlot.iife.min.js"></script>
+</head>
+<body>
+
+<!-- Barre de titre : heure UTC, badge de fix, etat de la connexion WebSocket -->
+<div id="titlebar">
+  <h1>VISUALGPS</h1>
+  <div id="titlebar-right">
+    <span id="utc-time">--- UTC</span>
+    <span id="fix-status" class="fix-badge fix-none">NO FIX</span>
+    <span id="ws-status" class="ws-disconnected">Déconnecté</span>
+  </div>
+</div>
+
+<!-- Barre d'onglets (data-tab pilote l'affichage dans app.js) -->
+<div id="tabbar">
+  <button class="tab-btn active" data-tab="frontpanel">Front Panel</button>
+  <button class="tab-btn"        data-tab="scatter">Scatter Plot</button>
+  <button class="tab-btn"        data-tab="position">Position Plot</button>
+  <button class="tab-btn"        data-tab="nmea">NMEA Monitor</button>
+</div>
+
+<!-- Zone principale : un .tab-pane par onglet (un seul .active a la fois) -->
+<div id="main">
+
+  <!-- Onglet 1 : Front Panel -->
+  <!-- Haut : barres de signal (canvas). Bas : donnees chiffrees + sky plot. -->
+  <div id="tab-frontpanel" class="tab-pane active">
+    <div id="satbar-container">
+      <canvas id="canvas-satbars"></canvas>
+    </div>
+    <div id="frontpanel-bottom">
+      <div id="gps-data">
+        <!-- Bloc Position -->
+        <div class="data-group">
+          <div class="section-title">Position</div>
+          <div class="data-row">
+            <span class="data-label">Latitude :</span>
+            <span class="data-value big" id="val-lat">---</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">Longitude :</span>
+            <span class="data-value big" id="val-lon">---</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">Altitude :</span>
+            <span class="data-value big" id="val-alt">---</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">Vitesse :</span>
+            <span class="data-value" id="val-spd">---</span>
+          </div>
+        </div>
+        <!-- Bloc DOP (dilution de precision) -->
+        <div class="data-group">
+          <div class="section-title">Précision DOP</div>
+          <div class="data-row">
+            <span class="data-label">PDOP :</span>
+            <span class="data-value" id="val-pdop">---</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">HDOP :</span>
+            <span class="data-value" id="val-hdop">---</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">VDOP :</span>
+            <span class="data-value" id="val-vdop">---</span>
+          </div>
+        </div>
+        <!-- Bloc compteurs satellites -->
+        <div class="data-group">
+          <div class="section-title">Satellites</div>
+          <div class="data-row">
+            <span class="data-label">Trackés :</span>
+            <span class="data-value" id="val-sats-tracked">0</span>
+          </div>
+          <div class="data-row">
+            <span class="data-label">En vue :</span>
+            <span class="data-value" id="val-sats-view">0</span>
+          </div>
+        </div>
+      </div>
+      <!-- Sky plot (canvas, dessine par skyplot.js) -->
+      <div id="skyplot-container">
+        <canvas id="canvas-skyplot"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onglet 2 : Scatter Plot (carte Leaflet, geree par scatter.js) -->
+  <div id="tab-scatter" class="tab-pane">
+    <div id="scatter-map"></div>
+  </div>
+
+  <!-- Onglet 3 : Position Plot (3 graphes uPlot : lat / lon / alt) -->
+  <div id="tab-position" class="tab-pane">
+    <div class="plot-wrapper">
+      <div class="plot-label">Latitude (°)</div>
+      <div id="plot-lat"></div>
+    </div>
+    <div class="plot-wrapper">
+      <div class="plot-label">Longitude (°)</div>
+      <div id="plot-lon"></div>
+    </div>
+    <div class="plot-wrapper">
+      <div class="plot-label">Altitude (M)</div>
+      <div id="plot-alt"></div>
+    </div>
+  </div>
+
+  <!-- Onglet 4 : NMEA Monitor (trames brutes colorees) -->
+  <div id="tab-nmea" class="tab-pane">
+    <pre id="nmea-receive"></pre>
+  </div>
+
+</div><!-- #main -->
+
+<!-- Barre de statut : nom du device GPS (renseigne par le backend) -->
+<div id="statusbar">
+  <span>visualGPS</span>
+  <span id="sb-device">---</span>
+</div>
+
+<!-- Scripts : les 3 modules (satbars / skyplot / scatter) AVANT app.js,
+     car app.js les utilise (SatBars, SkyPlot, ScatterPlot). -->
+<script src="js/satbars.js"></script>
+<script src="js/skyplot.js"></script>
+<script src="js/scatter.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

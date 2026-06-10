@@ -1,0 +1,353 @@
+/* ============================================================
+   visualGPS - style.css
+   Theme sombre, layout 100% flexbox adaptatif (aucune hauteur
+   fixe : tout se cale sur la taille de la fenetre). Organise par
+   sections : variables, barres (titre / onglets / statut), puis un
+   bloc par onglet (Front Panel, Scatter, Position, NMEA).
+   ============================================================ */
+
+/* Polices via Google Fonts (CDN). Note vie privee : le navigateur du
+   client contacte Google a chaque chargement de la page. Pour un
+   deploiement durci, heberger ces polices en local (voir README). */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;700&display=swap');
+
+:root {
+  --bg-deep:       #080d14;
+  --bg-panel:      #0d1520;
+  --bg-card:       #101a28;
+  --bg-bar:        #0a1018;
+  --border:        #1e3a5f;
+  --border-hi:     #2a5080;
+  --border-bright: #3a70b0;
+  --text-pri:      #e8eeff;
+  --text-sec:      #90aace;
+  --text-dim:      #4a6a90;
+  --accent-gps:    #5aacff;
+  --accent-ok:     #40e090;
+  --accent-warn:   #f0a030;
+  --accent-err:    #e84040;
+  --font-mono:     'Share Tech Mono', 'Courier New', monospace;
+  --font-head:     'Orbitron', monospace;
+  --titlebar-h:    40px;
+  --tabbar-h:      34px;
+  --statusbar-h:   26px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--bg-deep);
+  color: var(--text-pri);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Barre titre ---------------------------------------- */
+#titlebar {
+  flex: 0 0 var(--titlebar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  background: var(--bg-bar);
+  border-bottom: 2px solid var(--border-bright);
+}
+
+#titlebar h1 {
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--accent-gps);
+  text-shadow: 0 0 12px rgba(90,172,255,0.5);
+}
+
+#titlebar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+#utc-time {
+  font-size: 12px;
+  color: var(--text-sec);
+  letter-spacing: 1px;
+}
+
+.fix-badge {
+  font-family: var(--font-head);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+}
+.fix-3d   { background:#0a2a1a; color:#40e090; border:1px solid #40e090;
+             box-shadow:0 0 8px rgba(64,224,144,0.3); }
+.fix-2d   { background:#2a1a00; color:#f0a030; border:1px solid #f0a030; }
+.fix-none { background:#2a0808; color:#e84040; border:1px solid #e84040; }
+
+#ws-status {
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+}
+.ws-connected    { color:#40e090; border:1px solid #40e090; }
+.ws-connecting   { color:#f0a030; border:1px solid #f0a030; }
+.ws-disconnected { color:#e84040; border:1px solid #e84040; }
+
+/* ---- Barre onglets -------------------------------------- */
+#tabbar {
+  flex: 0 0 var(--tabbar-h);
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-bar);
+  border-bottom: 1px solid var(--border);
+  padding: 0 10px;
+}
+
+.tab-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 0 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab-btn:hover  { color: var(--text-sec); }
+.tab-btn.active { color: var(--accent-gps); border-bottom-color: var(--accent-gps); }
+
+/* ---- Zone principale ------------------------------------ */
+#main {
+  flex: 1 1 0;
+  min-height: 0;        /* crucial pour flex enfant qui ne déborde pas */
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-pane {
+  display: none;
+  position: absolute;
+  inset: 0;             /* top/right/bottom/left: 0 - remplit exactement #main */
+  overflow: hidden;
+}
+.tab-pane.active { display: flex; }
+
+/* ---- Barre statut --------------------------------------- */
+#statusbar {
+  flex: 0 0 var(--statusbar-h);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 14px;
+  background: var(--bg-bar);
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+#statusbar span { color: var(--text-sec); }
+
+/* ============================================================
+   Onglet 1 : Front Panel
+   ============================================================ */
+#tab-frontpanel {
+  flex-direction: column;
+}
+
+/* Satbar : hauteur adaptative - 15% du main, min 80px max 130px */
+#satbar-container {
+  flex: 0 0 15%;
+  min-height: 80px;
+  max-height: 130px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-panel);
+  padding: 4px 8px 0;
+  overflow: hidden;
+}
+
+#canvas-satbars {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Panneau inférieur : données + skyplot */
+#frontpanel-bottom {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Données GPS */
+#gps-data {
+  flex: 0 0 300px;
+  min-width: 200px;
+  max-width: 340px;
+  padding: 14px 18px;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.data-group { margin-bottom: 14px; }
+
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+.data-row:last-child { border-bottom: none; }
+
+.data-label { color: var(--text-sec); font-size: 11px; letter-spacing: 1px; }
+
+.data-value { color: var(--text-pri); font-size: 13px; text-align: right; }
+.data-value.big { font-size: 14px; color: #c8e8ff; font-weight: bold; }
+
+.section-title {
+  font-family: var(--font-head);
+  font-size: 9px;
+  color: var(--accent-gps);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-bright);
+  opacity: 0.8;
+}
+
+/* Sky plot : remplit le reste */
+#skyplot-container {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  padding: 10px;
+  overflow: hidden;
+}
+
+#canvas-skyplot { display: block; }
+
+/* ============================================================
+   Onglet 2 : Scatter Plot (Leaflet)
+   ============================================================ */
+#tab-scatter {
+  flex-direction: column;
+}
+
+#scatter-map {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+}
+
+.leaflet-container {
+  background: #080d14;
+  font-family: var(--font-mono);
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.scatter-stats {
+  background: rgba(8,13,20,0.82);
+  border: 1px solid var(--border-bright);
+  color: var(--text-sec);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 6px 10px;
+  line-height: 1.7;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.ring-tooltip {
+  background: rgba(8,13,20,0.85) !important;
+  border: 1px solid var(--border-bright) !important;
+  color: var(--text-sec) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  padding: 2px 6px !important;
+  border-radius: 2px !important;
+  box-shadow: none !important;
+}
+.ring-tooltip::before { display: none !important; }
+
+/* ============================================================
+   Onglet 3 : Position Plot
+   ============================================================ */
+#tab-position {
+  flex-direction: column;
+  padding: 10px 14px;
+  gap: 8px;
+  background: var(--bg-panel);
+  overflow-y: auto;
+}
+
+.plot-wrapper {
+  flex: 1 1 0;
+  min-height: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-bright);
+  border-radius: 2px;
+  padding: 8px 10px 6px;
+  overflow: hidden;
+}
+
+.plot-label {
+  font-family: var(--font-head);
+  font-size: 9px;
+  color: var(--accent-gps);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+
+.uplot, .uplot * { box-sizing: border-box; }
+.u-wrap { position: relative; }
+.u-select { background: rgba(90,172,255,0.12); }
+
+/* ============================================================
+   Onglet 4 : NMEA Monitor
+   ============================================================ */
+#tab-nmea { flex-direction: column; }
+
+#nmea-receive {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.7;
+  white-space: pre;
+  background: var(--bg-deep);
+  color: #c0d8f0;
+}
+
+/* ---- Scrollbars ----------------------------------------- */
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: var(--bg-panel); }
+::-webkit-scrollbar-thumb  { background: var(--border-hi); border-radius: 2px; }
+
+#nmea-receive::-webkit-scrollbar-track { background: var(--bg-deep); }

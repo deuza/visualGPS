@@ -1,0 +1,53 @@
+# ============================================================
+# visualgps.service - unit de REFERENCE
+# ============================================================
+# Note : install.sh regenere automatiquement cette unit avec les
+# valeurs choisies a l'installation (device, port). Ce fichier sert
+# de documentation et de point de depart pour une install manuelle.
+# ============================================================
+[Unit]
+Description=visualGPS - NMEA WebSocket backend
+After=network.target
+# Si le device USB n'est pas toujours present au boot, on tolere l'echec
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=visualgps
+Group=dialout
+
+WorkingDirectory=/opt/visualgps
+
+# Variables de configuration - modifier ici selon l'installation.
+# GPS_WS_HOST=0.0.0.0 : ecoute sur toutes les interfaces (acces LAN).
+# Mettre 127.0.0.1 pour restreindre a la boucle locale. Voir README.
+Environment="GPS_DEVICE=/dev/ttyUSB0"
+Environment="GPS_BAUD=9600"
+Environment="GPS_WS_PORT=8765"
+Environment="GPS_WS_HOST=127.0.0.1"
+
+ExecStart=/usr/bin/node /opt/visualgps/server.js
+
+# Redemarrage automatique en cas de crash
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=5
+
+# Durcissement
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6
+ReadWritePaths=/tmp
+
+# Logs
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=visualgps
+
+[Install]
+WantedBy=multi-user.target

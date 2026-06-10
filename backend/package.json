@@ -1,0 +1,17 @@
+{
+  "name": "visualgps-backend",
+  "version": "1.0.0",
+  "description": "VisualGPS backend - NMEA parser + WebSocket server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "serialport": "13.0.0",
+    "ws": "8.21.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "license": "WTFPL"
+}
