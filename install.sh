@@ -28,7 +28,7 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-# ---- Node.js ----------------------------------------------
+# ---- Node.js & npm ----------------------------------------
 echo "[*] Verification Node.js..."
 if ! command -v node > /dev/null 2>&1; then
   echo "[ERR] Node.js non trouve. Installer avec : apt install nodejs npm" >&2
@@ -41,6 +41,15 @@ if [ "$NODE_MAJOR" -lt 16 ]; then
   exit 1
 fi
 echo "[OK] Node.js $NODE_VER"
+
+# npm est un paquet SEPARE de nodejs sur Debian : on le verifie aussi,
+# sinon le "npm install" plus bas casse apres avoir deja modifie le systeme.
+echo "[*] Verification npm..."
+if ! command -v npm > /dev/null 2>&1; then
+  echo "[ERR] npm non trouve. Sur Debian c'est un paquet separe : apt install npm" >&2
+  exit 1
+fi
+echo "[OK] npm $(npm --version)"
 
 # ---- Detection automatique du device GPS ------------------
 echo "[*] Recherche du device GPS serie..."
@@ -145,7 +154,7 @@ WorkingDirectory=/opt/visualgps
 Environment="GPS_DEVICE=${GPS_DEVICE}"
 Environment="GPS_BAUD=9600"
 Environment="GPS_WS_PORT=${WS_PORT}"
-Environment="GPS_WS_HOST="127.0.0.1"
+Environment="GPS_WS_HOST=127.0.0.1"
 
 ExecStart=/usr/bin/node /opt/visualgps/server.js
 
@@ -182,11 +191,12 @@ echo "=============================================="
 echo " Backend    : $BACKEND_DEST"
 echo " Frontend   : $FRONTEND_DEST"
 echo " Device GPS : $GPS_DEVICE"
-echo " Port WS    : $WS_PORT (ecoute sur 0.0.0.0 / toutes interfaces)"
+echo " Port WS    : $WS_PORT (backend en ecoute locale sur 127.0.0.1)"
+echo " Acces LAN  : voir README (variable GPS_WS_HOST)"
 echo ""
 echo " Par defaut le dashboard n'est accessible QUE depuis la machine"
 echo " elle-meme. Pour le servir sur le LAN ou en HTTPS, voir le README"
-echo " (section nginx + warning exposition)."
+echo " (section Exposition reseau)."
 echo ""
 echo " Demarrer  : systemctl start visualgps"
 echo " Logs      : journalctl -u visualgps -f"

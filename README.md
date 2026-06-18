@@ -1,3 +1,4 @@
+
 # visualGPS
 
 Interface web temps réel pour récepteurs GPS NMEA, inspirée de VisualGPSView (Windows).
@@ -78,7 +79,7 @@ visualGPS lit uniquement les trames NMEA ; le signal PPS (présent sur ces modul
 
 - Debian 11 (Bullseye) ou supérieur - testé sur **Debian 13 (Trixie)**
 - Node.js ≥ 16 (testé avec 20 LTS)
-- Un serveur web (nginx, Apache2, ...) pour servir le frontend depuis `/var/www/html/`
+- Un serveur web (Apache2, ...) pour servir le frontend depuis `/var/www/html/`
 - Un récepteur GPS connecté sur un port série
 
 ```bash
@@ -127,9 +128,8 @@ journalctl -u visualgps -f
 
 Le frontend est un ensemble de fichiers statiques (HTML/CSS/JS), déployé par
 `install.sh` dans `/var/www/html/visualGPS/`. N'importe quel serveur web
-convient (nginx, Apache2, lighttpd...) : il suffit d'exposer ce répertoire.
-Avec une configuration servant `/var/www/html` (cas par défaut d'Apache2 ou
-d'un nginx fraîchement installé), le dashboard est accessible sur
+convient (Apache2, lighttpd...) : il suffit d'exposer ce répertoire.
+Avec une configuration servant `/var/www/html` (cas par défaut d'Apache2), le dashboard est accessible sur
 `http://<hôte>/visualGPS/`.
 
 La page se connecte au backend WebSocket sur le même hôte, port `8765`
@@ -224,6 +224,7 @@ visualGPS/
 
 Post installation :
 
+```
 /var/www/html/visualGPS/
 ├── index.html
 ├── js/
@@ -233,7 +234,6 @@ Post installation :
 │   └── skyplot.js
 └── css/
     └── style.css
-
 ```
 
 ---
