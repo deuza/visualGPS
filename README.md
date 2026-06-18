@@ -224,6 +224,7 @@ visualGPS/
 
 Post installation :
 
+```
 /var/www/html/visualGPS/
 ├── index.html
 ├── js/
@@ -233,7 +234,6 @@ Post installation :
 │   └── skyplot.js
 └── css/
     └── style.css
-
 ```
 
 ---
